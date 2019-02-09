@@ -191,123 +191,103 @@ function isPromise(x) {
   return x.constructor.name.toLowerCase() === 'promise'
 }
 
-function el(elem, ...children) {
-  let nodeDefinition = elem.split('.')
-  let node = nodeDefinition[0];
-  if (node.trim() === '') {
-    node = 'div'
+Node.prototype.attrs = function(attrs) {
+  for (const key in attrs) {
+    this.setAttribute(key, attrs[key]);
   }
-  let classes = nodeDefinition.splice(1).join(' ');
-  const element = document.createElement(node);
-  element.attr('class', classes);
-  for (const child of children) {
-    if (child instanceof Node) {
-      element.appendChild(child);
-    } else if (isPromise(child)) {
-      child.then((res) => element.appendChild(res))
-    } else if (child) {
-      element.innerHTML += child;
+  return this;
+};
+
+Node.prototype.props = function(props) {
+  this.props = {};
+  for (const key in props) {
+    this.props[key] = props[key];
+  }
+  return this;
+};
+
+Node.prototype.on = function(eventName, handler) {
+  this.addEventListener(eventName, e => {
+    return handler(e)
+  });
+  return this;
+};
+
+function handleObject(obj, p, v) {
+  if (Object.prototype.toString.call(p) === '[object Object]' && !v) {
+    for (const key in p) {
+      obj.style[key] = p[key];
     }
+  } else {
+    obj.style[p] = v;
   }
-  return element;
 }
 
-(function() {
-  Node.prototype.attrs = function(attrs) {
-    for (const key in attrs) {
-      this.setAttribute(key, attrs[key]);
-    }
-    return this;
-  };
-
-  Node.prototype.props = function(props) {
-    this.props = {};
-    for (const key in props) {
-      this.props[key] = props[key];
-    }
-    return this;
-  };
-
-  Node.prototype.on = function(eventName, handler) {
-    this.addEventListener(eventName, e => {
-      return handler(e)
+function cssHandler(p, v) {
+  if (this instanceof NodeList) {
+    this.forEach(function each(node) {
+      handleObject(node, p, v);
     });
-    return this;
-  };
-
-  function handleObject(obj, p, v) {
-    if (Object.prototype.toString.call(p) === '[object Object]' && !v) {
-      for (const key in p) {
-        obj.style[key] = p[key];
-      }
-    } else {
-      obj.style[p] = v;
-    }
+  } else if (this instanceof Node) {
+    handleObject(this, p, v);
   }
+  return this;
+}
 
-  function cssHandler(p, v) {
-    if (this instanceof NodeList) {
-      this.forEach(function each(node) {
-        handleObject(node, p, v);
+function attrHandler(a, v) {
+  if (this instanceof NodeList) {
+    this.forEach(function each(node) {
+      node.setAttribute(a, v);
+    });
+  } else if (this instanceof Node) {
+    this.setAttribute(a, v);
+  }
+  return this;
+}
+
+function dataHandler(key, val) {
+  if (this instanceof NodeList) {
+    if (!val) {
+      let data = [];
+      this.forEach(function(node) {
+        data.push(node.dataNode);
       });
-    } else if (this instanceof Node) {
-      handleObject(this, p, v);
+      return data;
     }
-    return this;
-  }
-
-  function attrHandler(a, v) {
-    if (this instanceof NodeList) {
-      this.forEach(function each(node) {
-        node.setAttribute(a, v);
-      });
-    } else if (this instanceof Node) {
-      this.setAttribute(a, v);
+    this.forEach(function each(node) {
+      node.dataNode = node.dataNode || {};
+      node.dataNode[key] = val;
+    });
+  } else if (this instanceof Node) {
+    if (!val) {
+      return this.dataNode;
     }
-    return this;
+    this.dataNode = this.dataNode || {};
+    this.dataNode[key] = val;
   }
+  return this;
+}
 
-  function dataHandler(key, val) {
-    if (this instanceof NodeList) {
-      if (!val) {
-        let data = [];
-        this.forEach(function(node) {
-          data.push(node.dataNode);
-        });
-        return data;
-      }
-      this.forEach(function each(node) {
-        node.dataNode = node.dataNode || {};
-        node.dataNode[key] = val;
-      });
-    } else if (this instanceof Node) {
-      if (!val) {
-        return this.dataNode;
-      }
-      this.dataNode = this.dataNode || {};
-      this.dataNode[key] = val;
-    }
-    return this;
+function eventHandler(event, handler) {
+  if (this instanceof NodeList) {
+    this.forEach(function each(node) {
+      node.addEventListener(event, handler, false);
+    });
+  } else if (this instanceof Node) {
+    this.addEventListener(event, handler, false);
   }
+  return this;
+}
 
-  function eventHandler(event, handler) {
-    if (this instanceof NodeList) {
-      this.forEach(function each(node) {
-        node.addEventListener(event, handler, false);
-      });
-    } else if (this instanceof Node) {
-      this.addEventListener(event, handler, false);
-    }
-    return this;
-  }
+Node.prototype.css = cssHandler;
+Node.prototype.attr = attrHandler;
+Node.prototype.data = dataHandler;
+Node.prototype.on = eventHandler;
 
-  Node.prototype.css = cssHandler;
-  Node.prototype.attr = attrHandler;
-  Node.prototype.data = dataHandler;
-  Node.prototype.on = eventHandler;
+NodeList.prototype.css = cssHandler;
+NodeList.prototype.attr = attrHandler;
+NodeList.prototype.data = dataHandler;
+NodeList.prototype.on = eventHandler;
 
-  NodeList.prototype.css = cssHandler;
-  NodeList.prototype.attr = attrHandler;
-  NodeList.prototype.data = dataHandler;
-  NodeList.prototype.on = eventHandler;
-})();
+
+module.exports = AppRunner;

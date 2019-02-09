@@ -1,3 +1,6 @@
+const el = require('../../el.js');
+const Image = require('../image/image.js');
+
 function User(props) {
   return (params) => {
     const user = props.state.users.find(u => u.id == params.id);
@@ -34,3 +37,5 @@ function User(props) {
     });
   }
 }
+
+module.exports = User;

@@ -1,3 +1,5 @@
+const el = require('../../el.js');
+
 function Hobbie(props) {
   return async () => {
     var response = await fetch('https://jsonplaceholder.typicode.com/users');
@@ -7,3 +9,5 @@ function Hobbie(props) {
     return el("div", title, ...users);
   }
 }
+
+module.exports = Hobbie;

@@ -1,3 +1,5 @@
+const el = require('../../el.js');
+
 function handleSubmit(props) {
   return (e) => {
     e.preventDefault();
@@ -37,3 +39,5 @@ function UserForm(props) {
     return form;
   }
 }
+
+module.exports = UserForm;

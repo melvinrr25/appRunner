@@ -1,3 +1,5 @@
+const el = require('../../el.js');
+
 function Image(props) {
   return () => {
     const styles = {
@@ -12,3 +14,5 @@ function Image(props) {
       });
   }
 }
+
+module.exports = Image;
