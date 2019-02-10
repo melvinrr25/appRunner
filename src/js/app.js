@@ -14,16 +14,19 @@ const routes = [{
   component: User
 }, {
   path: '/',
-  component: (props) => () => el('h3', 'Home Page', Hobbie(props)(), Hobbie(props)(), Hobbie(props)())
+  component: (props) => el('h3', 'Home Page', Hobbie(props), Hobbie(props), Hobbie(props))
 }, {
   path: '/about',
-  component: (props) => () => el('h3', 'About Page')
+  component: (props) => el('h3', 'About Page')
 }, {
   path: '/hobbie',
   component: Hobbie
 }, {
   path: '/contact',
-  component: (props) => () => el('h3', 'Contact Page')
+  component: (props) => el('h3', 'Contact Page')
+}, {
+  path: '/contact/:id',
+  component: (props) => el('h3', 'Contact # ' + props.params.id)
 }, ];
 
 routes.forEach((r) => app.registerRoute(r))

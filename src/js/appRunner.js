@@ -10,6 +10,10 @@ function AppRunner() {
   }
 
   function navigate(url) {
+    if(url[url.length - 1] == '/'){
+      url = url.substring(0, url.length - 1)
+    }
+
     history.pushState({}, null, url);
     const app = document.getElementById(root);
     let component = null;
@@ -24,7 +28,8 @@ function AppRunner() {
       props.state = state;
       props.navigate = navigate;
       props.setState = setState;
-      let handler = component(props)(params)
+      props.params = params;
+      let handler = component(props)
       if (isPromise(handler)) {
         handler.then((result) => {
           app.appendChild(result)
