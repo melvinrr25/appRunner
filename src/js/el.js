@@ -10,7 +10,9 @@ function el(elem, ...children) {
   }
   let classes = nodeDefinition.splice(1).join(' ');
   const element = document.createElement(node);
-  element.attr('class', classes);
+  if(classes.trim().length){
+    element.attr('class', classes);
+  }
   for (const child of children) {
     if (child instanceof Node) {
       element.appendChild(child);

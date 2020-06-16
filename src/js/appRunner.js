@@ -47,9 +47,11 @@ function AppRunner() {
     state = Object.assign(initialState, state)
   }
 
-  function registerRoute(routeObj) {
-    let route = buildRoute(routeObj.path, routeObj.component);
-    appRoutes = Object.assign(appRoutes, route);
+  function registerRoutes(userRoutes) {
+    userRoutes.forEach(function(routeObj){
+      let route = buildRoute(routeObj.path, routeObj.component);
+      appRoutes = Object.assign(appRoutes, route);
+    });
   }
 
   function start(id) {
@@ -186,7 +188,7 @@ function AppRunner() {
   }
 
   return {
-    registerRoute: registerRoute,
+    registerRoutes: registerRoutes,
     setInitialState: setInitialState,
     start: start
   }

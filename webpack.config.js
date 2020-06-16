@@ -10,8 +10,9 @@ const webpack = require('webpack');
 module.exports = {
   entry: './src/js/app.js',
   watch: true,
+  mode: "development",
   output: {
-    path: path.resolve(__dirname, 'dist'),
+    path: path.join(__dirname, 'dist'),
     filename: 'bundle.js'
   },
   module: {

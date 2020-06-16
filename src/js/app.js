@@ -1,10 +1,11 @@
 const AppRunner = require('./appRunner.js');
+const el = require('./el.js');
 const Users = require('./components/user/users.js');
 const User = require('./components/user/user.js');
 const Hobbie = require('./components/user/hobbie.js');
-const el = require('./el.js');
+const Menu = require('./components/menu.js');
 
-var app = AppRunner();
+var app = new AppRunner();
 
 const routes = [{
   path: '/users',
@@ -14,22 +15,20 @@ const routes = [{
   component: User
 }, {
   path: '/',
-  component: (props) => el('h3', 'Home Page', Hobbie(props), Hobbie(props), Hobbie(props))
+  component: (props) => el('div', Menu(props), el('h3', 'Home Page'))
 }, {
   path: '/about',
-  component: (props) => el('h3', 'About Page')
+  component: (props) => el('div', Menu(props), el('h3', 'About Page'))
 }, {
   path: '/hobbie',
   component: Hobbie
 }, {
   path: '/contact',
-  component: (props) => el('h3', 'Contact Page')
+  component: (props) => el('div', Menu(props), el('h3', 'Contact Page'))
 }, {
   path: '/contact/:id',
   component: (props) => el('h3', 'Contact # ' + props.params.id)
 }, ];
-
-routes.forEach((r) => app.registerRoute(r))
 
 app.setInitialState({
   users: [{
@@ -50,4 +49,5 @@ app.setInitialState({
   }]
 });
 
+app.registerRoutes(routes)
 app.start('root');

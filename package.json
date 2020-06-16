@@ -4,7 +4,7 @@
   "description": "JS Micro Framework to build small applications",
   "main": "app.js",
   "scripts": {
-    "start": "webpack-dev-server --entry ./src/js/app.js --output-filename ./dist/bundlejs --watch",
+    "start": "webpack-dev-server --entry ./src/js/app.js --output-filename ./dist/bundle.js --watch",
     "build": "webpack"
   },
   "repository": {
