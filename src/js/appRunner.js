@@ -3,6 +3,8 @@ function AppRunner() {
   let state = {};
   let appRoutes = {};
   let props = {};
+  let authRedirectTo = null;
+  let authMiddleware = null;
 
   function setState(prop, val) {
     state[prop] = val;
@@ -22,14 +24,24 @@ function AppRunner() {
     path = path === '/' ? '' : path;
     const route = routeChecker('GET', path, appRoutes);
     if (route.isMatching) {
-      component = route.handlers[0];
+      component = route.handler;
       let params = route.params;
-      app.innerHTML = null;
       props.state = state;
       props.navigate = navigate;
       props.setState = setState;
       props.params = params;
+
+      if(route.authenticate == true){
+        const result = authMiddleware(props.state)
+        if(result != true){
+          return navigate(authRedirectTo)
+        }
+      }
+
+      app.innerHTML = null;
+      
       let handler = component(props)
+      
       if (isPromise(handler)) {
         handler.then((result) => {
           app.appendChild(result)
@@ -49,9 +61,14 @@ function AppRunner() {
 
   function registerRoutes(userRoutes) {
     userRoutes.forEach(function(routeObj){
-      let route = buildRoute(routeObj.path, routeObj.component);
+      let route = buildRoute(routeObj.path, routeObj.component, routeObj.auth);
       appRoutes = Object.assign(appRoutes, route);
     });
+  }
+
+  function authorization(settings){
+   authRedirectTo = '#' + settings.redirectTo
+   authMiddleware = settings.middleware
   }
 
   function start(id) {
@@ -155,19 +172,21 @@ function AppRunner() {
           isMatching: false,
           route: null,
           params: {},
-          handlers: []
+          handler: null,
+          auth: false,
         }
       }
 
       let originalRoute = route.join('/');
       let routeKey = method + '|' + originalRoute;
-      let handlers = userRoutes[routeKey];
+      let data = userRoutes[routeKey];
 
       return {
         isMatching: true,
         route: originalRoute,
         params: mapParams(splitUrl, route),
-        handlers: handlers,
+        handler: data[0],
+        authenticate: data[1],
       }
     }
 
@@ -190,6 +209,7 @@ function AppRunner() {
   return {
     registerRoutes: registerRoutes,
     setInitialState: setInitialState,
+    authorization: authorization,
     start: start
   }
 }
